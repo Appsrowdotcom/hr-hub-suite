@@ -1,0 +1,168 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Users, Mail, Lock, ArrowRight } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    // Simulate login - In production, this would connect to authentication
+    setTimeout(() => {
+      setIsLoading(false);
+      
+      // Demo login routing based on email
+      if (email.includes('super')) {
+        navigate('/super-admin');
+      } else if (email.includes('company') || email.includes('admin')) {
+        navigate('/company-admin');
+      } else {
+        navigate('/hr');
+      }
+      
+      toast({
+        title: "Welcome back!",
+        description: "You've successfully logged in.",
+      });
+    }, 1000);
+  };
+
+  return (
+    <div className="min-h-screen gradient-hero flex items-center justify-center p-4">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
+        {/* Logo */}
+        <Link to="/" className="flex items-center justify-center gap-2 mb-8">
+          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
+            <Users className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <span className="text-2xl font-bold text-foreground">HRFlow</span>
+        </Link>
+
+        <Card variant="elevated" className="animate-scale-in">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Welcome back</CardTitle>
+            <CardDescription>Sign in to your account to continue</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="name@company.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <Link to="/forgot-password" className="text-sm text-accent hover:underline">
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              <Button type="submit" variant="accent" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-accent-foreground/30 border-t-accent-foreground rounded-full animate-spin" />
+                    Signing in...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    Sign in
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center text-sm text-muted-foreground">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-accent hover:underline font-medium">
+                Sign up
+              </Link>
+            </div>
+
+            {/* Demo accounts */}
+            <div className="mt-6 pt-6 border-t border-border">
+              <p className="text-xs text-muted-foreground text-center mb-3">Demo Accounts</p>
+              <div className="grid grid-cols-3 gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs"
+                  onClick={() => {
+                    setEmail('super@demo.com');
+                    setPassword('demo123');
+                  }}
+                >
+                  Super Admin
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs"
+                  onClick={() => {
+                    setEmail('company@demo.com');
+                    setPassword('demo123');
+                  }}
+                >
+                  Company
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs"
+                  onClick={() => {
+                    setEmail('hr@demo.com');
+                    setPassword('demo123');
+                  }}
+                >
+                  HR
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

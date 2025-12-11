@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -21,28 +22,30 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+        <AuthProvider>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* Super Admin Routes */}
-          <Route path="/super-admin" element={<SuperAdminDashboard />} />
+            {/* Super Admin Routes */}
+            <Route path="/super-admin" element={<SuperAdminDashboard />} />
 
-          {/* Company Admin Routes */}
-          <Route path="/company-admin" element={<CompanyAdminDashboard />} />
-          <Route path="/company-admin/employees" element={<EmployeesPage role="company_admin" />} />
-          <Route path="/company-admin/leaves" element={<LeavesPage role="company_admin" />} />
+            {/* Company Admin Routes */}
+            <Route path="/company-admin" element={<CompanyAdminDashboard />} />
+            <Route path="/company-admin/employees" element={<EmployeesPage role="company_admin" />} />
+            <Route path="/company-admin/leaves" element={<LeavesPage role="company_admin" />} />
 
-          {/* HR Routes */}
-          <Route path="/hr" element={<HRDashboard />} />
-          <Route path="/hr/employees" element={<EmployeesPage role="hr" />} />
-          <Route path="/hr/leaves" element={<LeavesPage role="hr" />} />
+            {/* HR Routes */}
+            <Route path="/hr" element={<HRDashboard />} />
+            <Route path="/hr/employees" element={<EmployeesPage role="hr" />} />
+            <Route path="/hr/leaves" element={<LeavesPage role="hr" />} />
 
-          {/* 404 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            {/* 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

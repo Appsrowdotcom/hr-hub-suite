@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Users, Mail, Lock, Building2, User, ArrowRight, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Register() {
   const [step, setStep] = useState(1);
@@ -19,6 +20,14 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signUp, user, loading, getRedirectPath } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      navigate(getRedirectPath());
+    }
+  }, [user, loading, navigate, getRedirectPath]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,17 +50,59 @@ export default function Register() {
       return;
     }
 
+    if (formData.password.length < 6) {
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 6 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     
-    setTimeout(() => {
+    const { error } = await signUp(
+      formData.email, 
+      formData.password, 
+      formData.fullName,
+      formData.companyName
+    );
+
+    if (error) {
       setIsLoading(false);
-      toast({
-        title: "Account created!",
-        description: "Welcome to HRFlow. Let's set up your workspace.",
-      });
-      navigate('/company-admin');
-    }, 1500);
+      
+      // Handle specific error cases
+      if (error.message?.includes('already registered')) {
+        toast({
+          title: "Account exists",
+          description: "An account with this email already exists. Please sign in instead.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Registration failed",
+          description: error.message || "Something went wrong. Please try again.",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
+    setIsLoading(false);
+    toast({
+      title: "Account created!",
+      description: "Welcome to HRFlow. Your workspace is ready.",
+    });
+    navigate('/company-admin');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen gradient-hero flex items-center justify-center p-4">
@@ -166,7 +217,7 @@ export default function Register() {
                         onChange={handleChange}
                         className="pl-10"
                         required
-                        minLength={8}
+                        minLength={6}
                       />
                     </div>
                   </div>

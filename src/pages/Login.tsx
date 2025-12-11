@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Users, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -13,30 +14,47 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signIn, user, loading, getRedirectPath } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      navigate(getRedirectPath());
+    }
+  }, [user, loading, navigate, getRedirectPath]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate login - In production, this would connect to authentication
-    setTimeout(() => {
+    const { error } = await signIn(email, password);
+    
+    if (error) {
       setIsLoading(false);
-      
-      // Demo login routing based on email
-      if (email.includes('super')) {
-        navigate('/super-admin');
-      } else if (email.includes('company') || email.includes('admin')) {
-        navigate('/company-admin');
-      } else {
-        navigate('/hr');
-      }
-      
       toast({
-        title: "Welcome back!",
-        description: "You've successfully logged in.",
+        title: "Sign in failed",
+        description: error.message === 'Invalid login credentials' 
+          ? "Invalid email or password. Please try again."
+          : error.message,
+        variant: "destructive",
       });
-    }, 1000);
+      return;
+    }
+
+    setIsLoading(false);
+    toast({
+      title: "Welcome back!",
+      description: "You've successfully logged in.",
+    });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen gradient-hero flex items-center justify-center p-4">
@@ -119,46 +137,6 @@ export default function Login() {
               <Link to="/register" className="text-accent hover:underline font-medium">
                 Sign up
               </Link>
-            </div>
-
-            {/* Demo accounts */}
-            <div className="mt-6 pt-6 border-t border-border">
-              <p className="text-xs text-muted-foreground text-center mb-3">Demo Accounts</p>
-              <div className="grid grid-cols-3 gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs"
-                  onClick={() => {
-                    setEmail('super@demo.com');
-                    setPassword('demo123');
-                  }}
-                >
-                  Super Admin
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs"
-                  onClick={() => {
-                    setEmail('company@demo.com');
-                    setPassword('demo123');
-                  }}
-                >
-                  Company
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs"
-                  onClick={() => {
-                    setEmail('hr@demo.com');
-                    setPassword('demo123');
-                  }}
-                >
-                  HR
-                </Button>
-              </div>
             </div>
           </CardContent>
         </Card>

@@ -70,7 +70,9 @@ export type Database = {
       }
       companies: {
         Row: {
+          accent_color: string | null
           address: string | null
+          background_color: string | null
           created_at: string
           email: string | null
           id: string
@@ -78,14 +80,19 @@ export type Database = {
           logo_url: string | null
           name: string
           phone: string | null
+          primary_color: string | null
+          secondary_color: string | null
           slug: string
           subscription_plan: string | null
           subscription_status: string | null
+          text_color: string | null
           updated_at: string
           website: string | null
         }
         Insert: {
+          accent_color?: string | null
           address?: string | null
+          background_color?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -93,14 +100,19 @@ export type Database = {
           logo_url?: string | null
           name: string
           phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
           slug: string
           subscription_plan?: string | null
           subscription_status?: string | null
+          text_color?: string | null
           updated_at?: string
           website?: string | null
         }
         Update: {
+          accent_color?: string | null
           address?: string | null
+          background_color?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -108,9 +120,12 @@ export type Database = {
           logo_url?: string | null
           name?: string
           phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
           slug?: string
           subscription_plan?: string | null
           subscription_status?: string | null
+          text_color?: string | null
           updated_at?: string
           website?: string | null
         }
